@@ -5,51 +5,49 @@ import DonationForm from './DonationForm';
 import RequestButton from './RequestButton';
 import FoodSearch from './FoodSearch';
 
-const initialFoods = [
-  {
-    id: 1,
-    name: 'Fresh Vegetable Meals',
-    type: 'Ready to Eat',
-    quantity: '35 meals',
-    time: 'Pickup before 6:00 PM',
-    location: 'Sector 17, Chandigarh',
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=700',
-  },
-  {
-    id: 2,
-    name: 'Fresh Bakery Collection',
-    type: 'Bakery',
-    quantity: '20 packets',
-    time: 'Pickup before 7:00 PM',
-    location: 'Sector 22, Chandigarh',
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=700',
-  },
-  {
-    id: 3,
-    name: 'Healthy Rice Bowls',
-    type: 'Prepared Food',
-    quantity: '25 meals',
-    time: 'Pickup before 5:30 PM',
-    location: 'Sector 35, Chandigarh',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=700',
-  },
-];
+const API_URL = 'http://localhost:5000/api/donations';
+
+const foodImage =
+  'https://images.unsplash.com/photo-1547592180-85f173990554?w=700';
+
+function formatDonation(donation) {
+  return {
+    id: donation._id,
+    name: donation.foodName,
+    type: donation.category,
+    quantity: donation.quantity,
+    time: `Pickup before ${new Date(donation.deadline).toLocaleString()}`,
+    location: donation.location,
+    image: foodImage,
+  };
+}
 
 function App() {
-  const [foods, setFoods] = useState(() => {
-    try {
-      const savedFoods = localStorage.getItem('foodrescue-donations');
-      return savedFoods ? JSON.parse(savedFoods) : initialFoods;
-    } catch {
-      return initialFoods;
-    }
-  });
-
+  const [foods, setFoods] = useState([]);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('foodrescue-donations', JSON.stringify(foods));
-  }, [foods]);
+    const fetchDonations = async () => {
+      try {
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error('Unable to fetch donations');
+        }
+
+        const result = await response.json();
+        setFoods(result.data.map(formatDonation));
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDonations();
+  }, []);
 
   const filteredFoods = foods.filter((food) =>
     `${food.name} ${food.location} ${food.type}`
@@ -57,19 +55,31 @@ function App() {
       .includes(search.toLowerCase())
   );
 
-  const addDonation = (donation) => {
-    const newDonation = {
-      id: Date.now(),
-      name: donation.foodName,
-      type: donation.category,
-      quantity: donation.quantity,
-      time: `Pickup before ${new Date(donation.deadline).toLocaleString()}`,
-      location: donation.location,
-      image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=700',
-    };
+  const addDonation = async (donation) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(donation),
+      });
 
-    setFoods((previousFoods) => [newDonation, ...previousFoods]);
-    alert('Donation added successfully!');
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Donation failed');
+      }
+
+      setFoods((previousFoods) => [
+        formatDonation(result.data),
+        ...previousFoods,
+      ]);
+
+      alert('Donation added successfully!');
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -133,7 +143,7 @@ function App() {
             <span>Food Listings</span>
           </div>
           <div>
-            <strong>{foods.filter((food) => food.id > 3).length}</strong>
+            <strong>{foods.length}</strong>
             <span>Community Donations</span>
           </div>
           <div>
@@ -161,13 +171,19 @@ function App() {
           <FoodSearch search={search} setSearch={setSearch} />
 
           <div className="food-grid">
-            {filteredFoods.length === 0 && (
+            {loading && <p>Loading donations...</p>}
+
+            {!loading && error && (
+              <p className="empty-message">{error}</p>
+            )}
+
+            {!loading && !error && filteredFoods.length === 0 && (
               <p className="empty-message">
                 No food donations found. Try another search.
               </p>
             )}
 
-            {filteredFoods.map((food) => (
+            {!loading && filteredFoods.map((food) => (
               <article className="food-card" key={food.id}>
                 <div className="food-image">
                   <img src={food.image} alt={food.name} />
