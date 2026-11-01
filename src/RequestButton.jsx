@@ -1,36 +1,60 @@
+import { useEffect, useState } from 'react';
 
-import { useState } from 'react';
+const API_URL = 'http://localhost:5000/api/requests';
 
 function RequestButton({ foodName }) {
-  const [requested, setRequested] = useState(() => {
-    try {
-      const requests = JSON.parse(
-        localStorage.getItem('foodrescue-requests') || '[]'
-      );
-      return requests.includes(foodName);
-    } catch {
-      return false;
-    }
-  });
+  const [requested, setRequested] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const handleRequest = () => {
-    try {
-      const requests = JSON.parse(
-        localStorage.getItem('foodrescue-requests') || '[]'
-      );
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const response = await fetch(API_URL);
+        const result = await response.json();
 
-      if (!requests.includes(foodName)) {
-        const updatedRequests = [...requests, foodName];
+        if (response.ok) {
+          const alreadyRequested = result.data.some(
+            (request) =>
+              request.foodName === foodName &&
+              request.status === 'Pending'
+          );
 
-        localStorage.setItem(
-          'foodrescue-requests',
-          JSON.stringify(updatedRequests)
-        );
-
-        setRequested(true);
+          setRequested(alreadyRequested);
+        }
+      } catch (error) {
+        console.error('Unable to fetch requests:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      alert('Unable to save your request. Please try again.');
+    };
+
+    fetchRequests();
+  }, [foodName]);
+
+  const handleRequest = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ foodName }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Request failed');
+      }
+
+      setRequested(true);
+      alert('Food request submitted successfully!');
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,9 +62,13 @@ function RequestButton({ foodName }) {
     <button
       className="claim-button"
       onClick={handleRequest}
-      disabled={requested}
+      disabled={requested || loading}
     >
-      {requested ? '✓ Request Submitted' : 'Request Donation →'}
+      {loading
+        ? 'Loading...'
+        : requested
+          ? '✓ Request Submitted'
+          : 'Request Donation →'}
     </button>
   );
 }

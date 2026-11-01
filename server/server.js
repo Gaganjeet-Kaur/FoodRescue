@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const donationRoutes = require('./routes/donationRoutes');
+const requestRoutes = require('./routes/requestRoutes');
 
 const app = express();
 
@@ -18,8 +19,9 @@ app.get('/', (req, res) => {
   });
 });
 
-// Donation routes
+// API routes
 app.use('/api/donations', donationRoutes);
+app.use('/api/requests', requestRoutes);
 
 const PORT = process.env.PORT || 5000;
 
