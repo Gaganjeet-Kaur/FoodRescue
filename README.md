@@ -1,16 +1,81 @@
-# React + Vite
+# FoodRescue – Smart Surplus Food Redistribution Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## About the Project
+FoodRescue is a MERN stack web application that connects surplus food donors with communities that need food. It helps reduce food waste by making surplus food available for donation and pickup requests.
 
-Currently, two official plugins are available:
+## Features
+- Add surplus food donations.
+- View available food donations.
+- Search donations by food name, location, and category.
+- Submit food pickup requests.
+- Store donations and requests in MongoDB.
+- Validate donation form inputs.
+- Set pickup deadlines.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Technology Stack
+- Frontend: React.js, CSS
+- Backend: Node.js, Express.js
+- Database: MongoDB Atlas
+- Tools: VS Code, Git, GitHub
 
-## React Compiler
+## Installation and Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Clone Repository
+```bash
+git clone https://github.com/Gaganjeet-Kaur/FoodRescue.git
+cd FoodRescue
+```
 
-## Expanding the ESLint configuration
+### 2. Install Frontend Dependencies
+```bash
+npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 3. Install Backend Dependencies
+```bash
+cd server
+npm install
+```
+
+### 4. Configure Environment Variables
+Create a `.env` file inside the `server` folder:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+PORT=5000
+```
+
+### 5. Start Backend
+Inside the `server` folder, run:
+
+```bash
+npm run dev
+```
+
+### 6. Start Frontend
+Open another terminal in the project root and run:
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173` in your browser.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /api/donations | Fetch donations |
+| POST | /api/donations | Add donation |
+| DELETE | /api/donations/:id | Delete donation |
+| GET | /api/requests | Fetch requests |
+| POST | /api/requests | Submit food request |
+
+## Future Enhancements
+- User authentication and role-based access.
+- NGO and donor dashboards.
+- Real-time pickup notifications.
+- Donation approval and collection tracking.
+
+## Project Goal
+Rescue Food. Reduce Waste. Feed Communities.
