@@ -23,6 +23,21 @@ function DonationForm({ onAddDonation }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (
+      !form.foodName.trim() ||
+      !form.quantity.trim() ||
+      !form.location.trim() ||
+      !form.deadline
+    ) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    if (!/^[1-9]\d*\s+\w+/.test(form.quantity.trim())) {
+      setError('Enter a valid quantity, e.g. 25 meals.');
+      return;
+    }
+
     if (new Date(form.deadline) <= new Date()) {
       setError('Please select a future pickup deadline.');
       return;
@@ -100,11 +115,17 @@ function DonationForm({ onAddDonation }) {
           name="deadline"
           value={form.deadline}
           onChange={handleChange}
-          min={new Date().toISOString().slice(0, 16)}
+          min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16)}
           required
         />
 
-        {error && <p className="success-message" style={{ color: '#c0392b' }}>{error}</p>}
+        {error && (
+          <p className="success-message" style={{ color: '#c0392b' }}>
+            {error}
+          </p>
+        )}
 
         <button type="submit" className="submit-donation">
           Submit Donation →
