@@ -1,37 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const API_URL = 'http://localhost:5000/api/requests';
 
-function RequestButton({ foodName }) {
-  const [requested, setRequested] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const response = await fetch(API_URL);
-        const result = await response.json();
-
-        if (response.ok) {
-          const alreadyRequested = result.data.some(
-            (request) =>
-              request.foodName === foodName &&
-              request.status === 'Pending'
-          );
-
-          setRequested(alreadyRequested);
-        }
-      } catch (error) {
-        console.error('Unable to fetch requests:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRequests();
-  }, [foodName]);
+function RequestButton({ donationId, token, requested, onRequested }) {
+  const [loading, setLoading] = useState(false);
 
   const handleRequest = async () => {
+    if (!token) {
+      alert('Please login as a receiver first.');
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -39,8 +18,9 @@ function RequestButton({ foodName }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ foodName }),
+        body: JSON.stringify({ donationId }),
       });
 
       const result = await response.json();
@@ -49,8 +29,8 @@ function RequestButton({ foodName }) {
         throw new Error(result.message || 'Request failed');
       }
 
-      setRequested(true);
       alert('Food request submitted successfully!');
+      await onRequested();
     } catch (error) {
       alert(error.message);
     } finally {
@@ -65,7 +45,7 @@ function RequestButton({ foodName }) {
       disabled={requested || loading}
     >
       {loading
-        ? 'Loading...'
+        ? 'Please wait...'
         : requested
           ? '✓ Request Submitted'
           : 'Request Donation →'}

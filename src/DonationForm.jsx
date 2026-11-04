@@ -33,8 +33,8 @@ function DonationForm({ onAddDonation }) {
       return;
     }
 
-    if (!/^[1-9]\d*\s+\w+/.test(form.quantity.trim())) {
-      setError('Enter a valid quantity, e.g. 25 meals.');
+    if (!/^[1-9]\d*(\s+\w+)?$/.test(form.quantity.trim())) {
+      setError('Enter a valid quantity, e.g. 25 or 25 meals.');
       return;
     }
 
@@ -81,7 +81,7 @@ function DonationForm({ onAddDonation }) {
           name="quantity"
           value={form.quantity}
           onChange={handleChange}
-          placeholder="e.g. 25 meals"
+          placeholder="e.g. 25 or 25 meals"
           required
         />
 

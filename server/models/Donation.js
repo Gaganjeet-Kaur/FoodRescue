@@ -2,27 +2,18 @@ const mongoose = require('mongoose');
 
 const donationSchema = new mongoose.Schema(
   {
-    foodName: {
-      type: String,
-      required: true,
-      trim: true,
+    foodName: { type: String, required: true, trim: true },
+    quantity: { type: String, required: true },
+    location: { type: String, required: true },
+    category: { type: String, required: true },
+    deadline: { type: Date, required: true },
+
+    donorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
-    quantity: {
-      type: String,
-      required: true,
-    },
-    location: {
-      type: String,
-      required: true,
-    },
-    category: {
-      type: String,
-      required: true,
-    },
-    deadline: {
-      type: Date,
-      required: true,
-    },
+
     status: {
       type: String,
       enum: ['Available', 'Requested', 'Collected'],

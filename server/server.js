@@ -5,11 +5,14 @@ require('dotenv').config();
 
 const donationRoutes = require('./routes/donationRoutes');
 const requestRoutes = require('./routes/requestRoutes');
+const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
 
 // Welcome route
 app.get('/', (req, res) => {
@@ -22,6 +25,8 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api/donations', donationRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 
@@ -38,8 +43,9 @@ async function startServer() {
       console.log(`FoodRescue server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('MongoDB connection failed:', error.message);
-  }
+  console.error('MongoDB connection failed:', error);
+  process.exit(1);
+}
 }
 
 startServer();
