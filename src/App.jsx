@@ -14,7 +14,7 @@ import RequestButton from './RequestButton';
 import FoodSearch from './FoodSearch';
 import AdminDashboard from './AdminDashboard';
 
-const API = 'http://localhost:5000/api';
+const API = 'https://foodrescue-7aug.onrender.com/api';
 const foodImage =
   'https://images.unsplash.com/photo-1547592180-85f173990554?w=700';
 

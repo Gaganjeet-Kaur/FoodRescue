@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const API_URL = 'http://localhost:5000/api/requests';
+const API_URL = 'https://foodrescue-7aug.onrender.com/api/requests';
 
 function RequestButton({ donationId, token, requested, onRequested }) {
   const [loading, setLoading] = useState(false);
